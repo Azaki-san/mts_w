@@ -13,8 +13,8 @@ import org.springframework.web.client.HttpClientErrorException
 @RestController
 class GamesController(private val steamDataService: SteamDataService){
     @GetMapping("/help")
-    fun copyright(): String {
-        return "©2024 Techaas. All rights reserved"
+    fun copyright(): ResponseEntity<String> {
+        return ResponseEntity.ok("©2024 Techaas. All rights reserved")
     }
 
     @GetMapping("/games")

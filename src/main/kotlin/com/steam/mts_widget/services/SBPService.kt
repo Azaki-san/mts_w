@@ -12,6 +12,15 @@ class SBPService {
     fun getBillLink(price: Int, username: String): String? {
         val chromeOptions = ChromeOptions()
         chromeOptions.addArguments("--headless")
+        chromeOptions.setExperimentalOption("excludeSwitches", listOf("enable-automation"))
+        chromeOptions.setExperimentalOption("prefs", mapOf(
+            "profile.managed_default_content_settings.images" to 2,
+            "profile.managed_default_content_settings.javascript" to 2,
+            "profile.managed_default_content_settings.css" to 2
+        ))
+        chromeOptions.addArguments("--disable-extensions")
+        chromeOptions.addArguments("--disable-gpu")
+        chromeOptions.addArguments("--no-sandbox")
         val driver: WebDriver = ChromeDriver(chromeOptions)
 
         driver.get("http://payment.mts.ru/cyber/steam/")

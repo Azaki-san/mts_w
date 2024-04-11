@@ -2,7 +2,9 @@ package com.steam.mts_widget.controller
 
 import com.steam.mts_widget.services.Game
 import com.steam.mts_widget.services.SteamDataService
+import com.steam.mts_widget.services.SteamWebParser
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -11,7 +13,7 @@ import org.springframework.web.client.HttpClientErrorException
 
 
 @RestController
-class GamesController(private val steamDataService: SteamDataService){
+class GamesController(private val steamDataService: SteamDataService, private val steamWebParser: SteamWebParser) {
     @GetMapping("/help")
     fun copyright(): String {
         return "©2024 Techaas. All rights reserved"
@@ -34,5 +36,10 @@ class GamesController(private val steamDataService: SteamDataService){
         } catch (e: HttpClientErrorException) {
             ResponseEntity.status(e.statusCode).body("Error fetching game details: ${e.message}")
         }
+    }
+
+    @GetMapping("/genres", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getGamesByGenre(@RequestParam(required = true) genre: String?): ResponseEntity<Any> {
+        return ResponseEntity.ok(steamWebParser.getGenres())
     }
 }

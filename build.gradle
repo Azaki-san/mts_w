@@ -27,7 +27,6 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
     implementation 'com.fleeksoft.ksoup:ksoup:0.1.2'
     implementation 'com.fleeksoft.ksoup:ksoup-network:0.1.2'
-    implementation 'org.jsoup:jsoup:1.17.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

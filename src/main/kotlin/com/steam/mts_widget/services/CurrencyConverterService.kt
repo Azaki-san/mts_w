@@ -3,11 +3,8 @@ package com.steam.mts_widget.services
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.network.parseGetRequestBlocking
 import com.fleeksoft.ksoup.nodes.Document
-import com.fleeksoft.ksoup.nodes.Element
-import com.fleeksoft.ksoup.select.Elements
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
-import org.jsoup.Jsoup
 
 @Service
 class CurrencyConverterService(private val restTemplate: RestTemplate) {

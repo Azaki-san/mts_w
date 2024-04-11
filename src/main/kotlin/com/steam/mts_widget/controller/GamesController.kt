@@ -1,16 +1,19 @@
 package com.steam.mts_widget.controller
 
+import com.google.gson.JsonObject
 import com.steam.mts_widget.services.Game
 import com.steam.mts_widget.services.SteamDataService
 import com.steam.mts_widget.services.SteamWebParser
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.HttpClientErrorException
 
-
+@CrossOrigin(origins = ["http://localhost:5174"], maxAge = 3600)
 @RestController
 class GamesController(private val steamDataService: SteamDataService, private val steamWebParser: SteamWebParser) {
     @GetMapping("/help")
@@ -18,13 +21,8 @@ class GamesController(private val steamDataService: SteamDataService, private va
         return ResponseEntity.ok("©2024 Techaas. All rights reserved")
     }
 
-    @GetMapping("/games")
-    fun getAllGames(): ResponseEntity<List<Game>> {
-        return ResponseEntity.ok(steamDataService.getAllDiscountedGames())
-    }
-
-    @GetMapping("/discounted")
-    fun getDiscountedGames(): ResponseEntity<Int> {
+    @GetMapping("/games", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getDiscountedGames(): ResponseEntity<String> {
         return ResponseEntity.ok(steamWebParser.parseDiscountedGames())
     }
 
@@ -40,5 +38,10 @@ class GamesController(private val steamDataService: SteamDataService, private va
         } catch (e: HttpClientErrorException) {
             ResponseEntity.status(e.statusCode).body("Error fetching game details: ${e.message}")
         }
+    }
+
+    @GetMapping("/genres", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getGamesByGenre(@RequestParam(required = true) genre: String?): ResponseEntity<Any> {
+        return ResponseEntity.ok(steamWebParser.getGenres())
     }
 }

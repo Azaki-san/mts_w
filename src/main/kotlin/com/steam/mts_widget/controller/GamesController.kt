@@ -9,6 +9,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.HttpClientErrorException
@@ -26,7 +27,7 @@ class GamesController(private val steamDataService: SteamDataService, private va
         return ResponseEntity.ok(steamWebParser.parseDiscountedGames())
     }
 
-    @GetMapping("/game")
+    @GetMapping("/game", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getGame(@RequestParam(required = true) gameId: String?): ResponseEntity<Any> {
         if (gameId == null || !gameId.matches(Regex("\\d+"))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Parameter 'gameId' must be a valid integer")
@@ -38,6 +39,11 @@ class GamesController(private val steamDataService: SteamDataService, private va
         } catch (e: HttpClientErrorException) {
             ResponseEntity.status(e.statusCode).body("Error fetching game details: ${e.message}")
         }
+    }
+
+    @GetMapping("/search/{word}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun searchGame(@PathVariable word: String?): ResponseEntity<String>{
+        return ResponseEntity.ok(steamWebParser.searchGameWithWord(word))
     }
 
     @GetMapping("/genres", produces = [MediaType.APPLICATION_JSON_VALUE])

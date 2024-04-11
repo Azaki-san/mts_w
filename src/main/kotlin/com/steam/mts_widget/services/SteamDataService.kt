@@ -29,12 +29,9 @@ class SteamDataService(private val restTemplate: RestTemplate) {
         TODO("Implement parsing Steam Store web from search page ")
     }
 
-    fun getGame(gameId: Int) : ApiData {
+    fun getGame(gameId: Int) : ApiData? {
         val url = "https://store.steampowered.com/api/appdetails?appids=$gameId"
         val response = restTemplate.getForObject(url, ApiData::class.java)
-        if (response == null || response.name.isEmpty()) {
-            throw HttpClientErrorException(HttpStatus.NOT_FOUND, "Game not found")
-        }
         return response
     }
 }
@@ -51,19 +48,15 @@ class StoreApiResponseDeserializer : JsonDeserializer<ApiData>() {
                 val dataNode = value["data"]
                 val name : String
                 val appId : Int
-                val screenshots = mutableListOf<String>()
+                var screenshots = ""
                 val description : String
                 val developers = mutableListOf<String>()
                 val releaseDate : String
                 val price : String
-
                 dataNode["name"]!!.let { name = it.asText()}
                 dataNode["steam_appid"]!!.let { appId = it.asInt() }
                 dataNode["screenshots"]!!.let {
-                    it.forEach { screenshot ->
-                        val path = screenshot["path_thumbnail"].asText()
-                        screenshots.add(path)
-                    }
+                    screenshots = it[0]["path_thumbnail"].asText()
                 }
                 dataNode["about_the_game"]!!.let { description = it.asText() }
                 dataNode["developers"]!!.let {
@@ -72,19 +65,22 @@ class StoreApiResponseDeserializer : JsonDeserializer<ApiData>() {
                     }
                 }
                 dataNode["release_date"]!!["date"]!!.let { releaseDate = it.asText() }
-                dataNode["price_overview"]!!["final"]!!.let { price = it.asText() }
+                when (val priceOverview = dataNode["price_overview"]) {
+                    null -> return null
+                    else -> price = priceOverview["final"].asText()
+                }
 
-                data = ApiData(appId, name, price, screenshots, description, developers, releaseDate)
+                return ApiData(appId, name, price, screenshots, description, developers, releaseDate)
             }
         }
-        return data
+        return null
     }
 }
 @JsonDeserialize(using = StoreApiResponseDeserializer::class)
 data class ApiData(val id : Int,
                    val name: String,
                    val price: String,
-                   val images: List<String>,
+                   val images: String,
                    val description: String,
                    val developers: List<String>,
                    val releaseDate: String)

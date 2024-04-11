@@ -23,11 +23,30 @@ class SteamWebParser (private val apiParser: SteamDataService, private val mappe
             )
         }
         return mapper.writeValueAsString(gameInfos)
-
     }
 
     fun parseGameDetails() {
         TODO()
     }
 
+    fun getGenres():  String {
+        val doc = Ksoup.parseGetRequestBlocking("https://store.steampowered.com/")
+        val elements = doc.select("div.home_page_gutter_block a.gutter_item")
+        val genres : MutableList<String> = mutableListOf()
+        var data : Genres? = null
+        if (elements.isNotEmpty()) {
+            for (element in elements) {
+                val href = element.attr("href")
+                if (href.contains("store.steampowered.com/tags")) {
+                    print(element)
+                    genres.add(element.text())
+                }
+            }
+            data = Genres(genres)
+            return mapper.writeValueAsString(data)
+        } else {
+            println("No elements found with the specified class.")
+        }
+        return ""
+    }
 }

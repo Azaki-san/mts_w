@@ -38,4 +38,9 @@ class GamesController(private val steamDataService: SteamDataService, private va
             ResponseEntity.status(e.statusCode).body("Error fetching game details: ${e.message}")
         }
     }
+
+    @GetMapping("/genres", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getGamesByGenre(@RequestParam(required = true) genre: String?): ResponseEntity<Any> {
+        return ResponseEntity.ok(steamWebParser.getGenres())
+    }
 }

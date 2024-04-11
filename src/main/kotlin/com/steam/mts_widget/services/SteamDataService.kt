@@ -89,6 +89,8 @@ data class ApiData(val id : Int,
                    val developers: List<String>,
                    val releaseDate: String)
 
+
+data class Genres(val genres: MutableList<String>)
 data class Game(val appid: Int, val name: String)
 data class SteamApiResponse(val applist: AppList)
 data class AppList(val apps: List<Game>)

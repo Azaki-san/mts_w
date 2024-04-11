@@ -1,7 +1,6 @@
 package com.steam.mts_widget.services
 
 import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.BeanDescription
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
@@ -13,7 +12,7 @@ import org.springframework.web.client.RestTemplate
 
 
 @Service
-class SteamDataService(private val restTemplate: RestTemplate, private val stringToJson: StringToJsonService) {
+class SteamDataService(private val restTemplate: RestTemplate) {
     fun getAllDiscountedGames(): List<Game> {
         TODO("Implement parsing Steam Store web, only discounted games")
     }
@@ -30,12 +29,13 @@ class SteamDataService(private val restTemplate: RestTemplate, private val strin
         TODO("Implement parsing Steam Store web from search page ")
     }
 
-    fun getGame(gameId: Int)  {
+    fun getGame(gameId: Int) : ApiData {
         val url = "https://store.steampowered.com/api/appdetails?appids=$gameId"
         val response = restTemplate.getForObject(url, ApiData::class.java)
         if (response == null || response.name.isEmpty()) {
             throw HttpClientErrorException(HttpStatus.NOT_FOUND, "Game not found")
         }
+        return response
     }
 }
 
@@ -65,7 +65,7 @@ class StoreApiResponseDeserializer : JsonDeserializer<ApiData>() {
                         screenshots.add(path)
                     }
                 }
-                dataNode["detailed_description"]!!.let { description = it.asText() }
+                dataNode["about_the_game"]!!.let { description = it.asText() }
                 dataNode["developers"]!!.let {
                     it.forEach { developer ->
                         developers.add(developer.asText())

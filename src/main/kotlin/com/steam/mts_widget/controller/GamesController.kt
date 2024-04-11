@@ -1,9 +1,11 @@
 package com.steam.mts_widget.controller
 
+import com.google.gson.JsonObject
 import com.steam.mts_widget.services.Game
 import com.steam.mts_widget.services.SteamDataService
 import com.steam.mts_widget.services.SteamWebParser
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -18,13 +20,8 @@ class GamesController(private val steamDataService: SteamDataService, private va
         return "©2024 Techaas. All rights reserved"
     }
 
-    @GetMapping("/games")
-    fun getAllGames(): ResponseEntity<List<Game>> {
-        return ResponseEntity.ok(steamDataService.getAllDiscountedGames())
-    }
-
-    @GetMapping("/discounted")
-    fun getDiscountedGames(): ResponseEntity<Int> {
+    @GetMapping("/games", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getDiscountedGames(): ResponseEntity<String> {
         return ResponseEntity.ok(steamWebParser.parseDiscountedGames())
     }
 

@@ -3,25 +3,20 @@ package com.steam.mts_widget.services
 import org.openqa.selenium.By
 import org.openqa.selenium.Keys
 import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
+import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.FirefoxOptions
 import org.springframework.stereotype.Service
 
 @Service
 class SBPService {
     fun getBillLink(price: Int, username: String): String? {
-        val chromeOptions = ChromeOptions()
+        val chromeOptions = FirefoxOptions()
         chromeOptions.addArguments("--headless")
-        chromeOptions.setExperimentalOption("excludeSwitches", listOf("enable-automation"))
-        chromeOptions.setExperimentalOption("prefs", mapOf(
-            "profile.managed_default_content_settings.images" to 2,
-            "profile.managed_default_content_settings.javascript" to 2,
-            "profile.managed_default_content_settings.css" to 2
-        ))
         chromeOptions.addArguments("--disable-extensions")
         chromeOptions.addArguments("--disable-gpu")
         chromeOptions.addArguments("--no-sandbox")
-        val driver: WebDriver = ChromeDriver(chromeOptions)
+        val driver: WebDriver = FirefoxDriver(chromeOptions)
 
         driver.get("http://payment.mts.ru/cyber/steam/")
         Thread.sleep(1000)

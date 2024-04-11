@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
+import javax.annotation.meta.TypeQualifierNickname
 
 
 @Service
@@ -88,5 +89,5 @@ data class ApiData(val id : Int,
 
 data class Genres(val genres: MutableList<String>)
 data class Game(val appid: Int, val name: String)
-data class SteamApiResponse(val applist: AppList)
-data class AppList(val apps: List<Game>)
+
+data class BuyGame(val username: String, val price: Int)

@@ -19,14 +19,42 @@ class SteamWebParser (private val apiParser: SteamDataService, private val mappe
         for (i in 0 until 11) {
             val id = discountedGames[i].attr("data-ds-appid").split(",")[0].toInt()
             gameInfos.add(
-                apiParser.getGame(id)
+                apiParser.getGame(id)!!
             )
         }
         return mapper.writeValueAsString(gameInfos)
     }
 
-    fun parseGameDetails() {
-        TODO()
+    fun searchGameWithWord(word: String?): String {
+        val doc = Ksoup.parseGetRequestBlocking("https://store.steampowered.com/search/?term=$word")
+        val elements = doc.select("div#search_resultsRows a.search_result_row")
+        val games : MutableList<ApiData> = mutableListOf()
+        var i = 0
+        var max = 10
+        if (elements.isNotEmpty()) {
+            while (i <= max){
+                println(elements[i].attr("data-ds-appid"))
+                println(elements[i].attr("href"))
+                if (elements[i].attr("data-ds-appid") == "") {
+                    max++
+                    i++
+                    continue
+                }
+                val ids = elements[i].attr("data-ds-appid").split(",")
+                for (id in ids) {
+                    val game = apiParser.getGame(id.toInt())
+                    if (game != null) {
+                        games.add(game)
+                        break
+                    }
+                }
+                i++
+            }
+            return mapper.writeValueAsString(games)
+        } else {
+            println("No elements found with the specified class.")
+        }
+        return ""
     }
 
     fun getGenres():  String {

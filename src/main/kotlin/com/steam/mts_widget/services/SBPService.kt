@@ -36,7 +36,7 @@ class SBPService {
         val payButton = driver.findElement(By.id("pay"))
         payButton.click()
 
-        Thread.sleep(2000)
+        Thread.sleep(2500)
 
         val currentUrl = driver.currentUrl
         if (currentUrl.contains("qr.nspk.ru")) {

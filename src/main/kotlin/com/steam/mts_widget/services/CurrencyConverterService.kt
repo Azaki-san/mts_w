@@ -1,12 +1,17 @@
 package com.steam.mts_widget.services
 
+import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.network.parseGetRequestBlocking
+import com.fleeksoft.ksoup.nodes.Document
+import com.fleeksoft.ksoup.nodes.Element
+import com.fleeksoft.ksoup.select.Elements
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.getForObject
+import org.jsoup.Jsoup
 
 @Service
 class CurrencyConverterService(private val restTemplate: RestTemplate) {
-    fun getSteamUsdToRub(money: Int): Double? {
+    fun getSteamUsdFromRub(money: Int): Double? {
         val url = "https://api.steam-currency.ru/currency/USD:RUB"
         val response = restTemplate.getForObject(url, CurrencyResponse::class.java)
         return when {
@@ -23,8 +28,17 @@ class CurrencyConverterService(private val restTemplate: RestTemplate) {
         }
     }
 
-    fun getMtsUsdToRub(money: Double): Double? {
-        return 0.0
+    fun getMtsRubFromSteamUsd(money: Double): Double? {
+        val doc: Document = Ksoup.parseGetRequestBlocking(url = "https://www.mtsbank.ru/")
+        val sellingPriceElement = doc.select(".Wrapper-sc-1vydk7-0.BfQtf")[2]
+        val sellingPrice = sellingPriceElement.text()
+        return try {
+            val sellingPriceFormatted = sellingPrice.replace(",", ".")
+            sellingPriceFormatted.toDouble() * money
+        } catch (e: NumberFormatException) {
+            println("Error converting selling price to double: ${e.message}")
+            null
+        }
     }
 }
 

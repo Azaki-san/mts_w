@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.hamcrest.Matchers.containsString
-import org.hamcrest.Matchers.equalTo
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @SpringBootTest
@@ -18,7 +17,7 @@ class MtsWidgetApplicationTests {
     private lateinit var mockMvc: MockMvc
 
     @Test
-    fun `test getBillLink endpoint with valid parameters`() {
+    fun `test bill endpoint with valid parameters`() {
         mockMvc.perform(
             get("/bill")
                 .param("priceWithoutFee", "350")
@@ -28,7 +27,7 @@ class MtsWidgetApplicationTests {
     }
 
     @Test
-    fun `test getBillLink endpoint with invalid parameters`() {
+    fun `test bill endpoint with invalid parameters`() {
         val expectedResponseBody =
             "Parameter 'priceWithoutFee' must be a valid integer. Parameter 'username' must be a valid string."
         mockMvc.perform(
@@ -40,7 +39,7 @@ class MtsWidgetApplicationTests {
     }
 
     @Test
-    fun `test getBillLink endpoint without priceWithoutFee`() {
+    fun `test bill endpoint without priceWithoutFee`() {
         val expectedResponseBody = "Parameter 'priceWithoutFee' must be a valid integer."
         mockMvc.perform(
             get("/bill")
@@ -51,7 +50,7 @@ class MtsWidgetApplicationTests {
     }
 
     @Test
-    fun `test getBillLink endpoint without priceWithoutUsername`() {
+    fun `test bill endpoint without priceWithoutUsername`() {
         val expectedResponseBody = "Parameter 'username' must be a valid string."
         mockMvc.perform(
             get("/bill")
@@ -62,7 +61,7 @@ class MtsWidgetApplicationTests {
     }
 
     @Test
-    fun `test getBillLink endpoint without everything`() {
+    fun `test bill endpoint without everything`() {
         val expectedResponseBody =
             "Parameter 'priceWithoutFee' must be a valid integer. Parameter 'username' must be a valid string."
 
@@ -80,11 +79,12 @@ class MtsWidgetApplicationTests {
             .andExpect(content().string(containsString(expectedResponseBody)))
     }
 
-    @Test
-    fun `test games endpoint`() {
-        mockMvc.perform(get("/games"))
-            .andExpect(status().isOk)
-    }
+    // DEPRECATED
+//    @Test
+//    fun `test games endpoint`() {
+//        mockMvc.perform(get("/games"))
+//            .andExpect(status().isOk)
+//    }
 
 //    @Test
 //    fun `test game endpoint`() {

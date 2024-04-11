@@ -56,8 +56,8 @@ class StoreApiResponseDeserializer : JsonDeserializer<ApiData>() {
                 val price : String
                 dataNode["name"]!!.let { name = it.asText()}
                 dataNode["steam_appid"]!!.let { appId = it.asInt() }
-                dataNode["screenshots"]!!.let {
-                    screenshots = it[0]["path_thumbnail"].asText()
+                dataNode["header_image"]!!.let {
+                    screenshots = it.asText()
                 }
                 dataNode["about_the_game"]!!.let { description = it.asText() }
                 dataNode["developers"]!!.let {

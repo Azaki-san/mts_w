@@ -1,5 +1,6 @@
 package com.steam.mts_widget.controller
 
+import com.google.gson.JsonObject
 import com.steam.mts_widget.services.Game
 import com.steam.mts_widget.services.SteamDataService
 import com.steam.mts_widget.services.SteamWebParser
@@ -15,13 +16,13 @@ import org.springframework.web.client.HttpClientErrorException
 @RestController
 class GamesController(private val steamDataService: SteamDataService, private val steamWebParser: SteamWebParser) {
     @GetMapping("/help")
-    fun copyright(): String {
-        return "©2024 Techaas. All rights reserved"
+    fun copyright(): ResponseEntity<String> {
+        return ResponseEntity.ok("©2024 Techaas. All rights reserved")
     }
 
-    @GetMapping("/games")
-    fun getAllGames(): ResponseEntity<List<Game>> {
-        return ResponseEntity.ok(steamDataService.getAllDiscountedGames())
+    @GetMapping("/games", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getDiscountedGames(): ResponseEntity<String> {
+        return ResponseEntity.ok(steamWebParser.parseDiscountedGames())
     }
 
     @GetMapping("/game")

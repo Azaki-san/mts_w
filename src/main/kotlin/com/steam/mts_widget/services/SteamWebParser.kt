@@ -7,14 +7,22 @@ import com.fleeksoft.ksoup.nodes.Document
 import org.springframework.stereotype.Service
 
 @Service
-class SteamWebParser (private val mapper:ObjectMapper) {
-    fun parseDiscountedGames() {
-        val html = "<html><head><title>One</title></head><body>Two</body></html>"
-        val doc: Document = Ksoup.parse(html = html)
+class SteamWebParser (private val apiParser: SteamDataService, private val mapper:ObjectMapper) {
+    fun parseDiscountedGames(): String? {
+        val doc: Document = Ksoup.parseGetRequestBlocking("https://store.steampowered.com/")
+        val games = doc.select("div#tab_specials_content")[0]
 
-        println("title => ${doc.title()}") // One
-        println("bodyText => ${doc.body().text()}") // Two
-
+        val discountedGames = games.childElementsList().filter {
+            it.`is`("a")
+        }
+        val gameInfos : MutableList<ApiData> = mutableListOf()
+        for (i in 0 until 11) {
+            val id = discountedGames[i].attr("data-ds-appid").split(",")[0].toInt()
+            gameInfos.add(
+                apiParser.getGame(id)
+            )
+        }
+        return mapper.writeValueAsString(gameInfos)
     }
 
     fun parseGameDetails() {

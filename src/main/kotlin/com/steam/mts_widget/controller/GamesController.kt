@@ -19,7 +19,7 @@ class GamesController(private val steamDataService: SteamDataService){
 
     @GetMapping("/games")
     fun getAllGames(): ResponseEntity<List<Game>> {
-        return ResponseEntity.ok(steamDataService.getAllGames())
+        return ResponseEntity.ok(steamDataService.getAllDiscountedGames())
     }
 
     @GetMapping("/game")
@@ -29,13 +29,8 @@ class GamesController(private val steamDataService: SteamDataService){
         }
         return try {
             val gameIdInt = gameId.toInt()
-            val gameData: Map<String, Any>? = steamDataService.getGame(gameIdInt)
-
-            if (gameData != null && gameData["success"] != false) {
-                return ResponseEntity.ok(gameData["data"])
-            } else {
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body("Game details not found for app ID: $gameId")
-            }
+            steamDataService.getGame(gameIdInt)
+            ResponseEntity.ok("Game details fetched for app ID: $gameId")
         } catch (e: HttpClientErrorException) {
             ResponseEntity.status(e.statusCode).body("Error fetching game details: ${e.message}")
         }

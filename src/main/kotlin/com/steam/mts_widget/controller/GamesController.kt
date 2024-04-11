@@ -7,12 +7,13 @@ import com.steam.mts_widget.services.SteamWebParser
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.HttpClientErrorException
 
-
+@CrossOrigin(origins = ["http://localhost:5174"], maxAge = 3600)
 @RestController
 class GamesController(private val steamDataService: SteamDataService, private val steamWebParser: SteamWebParser) {
     @GetMapping("/help")

@@ -1,31 +1,93 @@
 package com.steam.mts_widget.services
 
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.BeanDescription
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
 
 @Service
 class SteamDataService(private val restTemplate: RestTemplate, private val stringToJson: StringToJsonService) {
-    fun getAllGames(): List<Game> {
-        val url = "https://api.steampowered.com/ISteamApps/GetAppList/v2"
-        val response = restTemplate.getForObject(url, SteamApiResponse::class.java)
-        val games = response?.applist?.apps
-            ?.filter { it.name.contains("hentai", ignoreCase = true).not() }
-            ?.filter { it.name.isNotEmpty() }
-            ?.map { it.copy(name = it.name.trim()) }
-            ?.sortedBy { it.name }
-            ?: emptyList()
-
-        return games
+    fun getAllDiscountedGames(): List<Game> {
+        TODO("Implement parsing Steam Store web, only discounted games")
     }
 
-    fun getGame(gameId: Int): Map<String, Any>? {
-        val response: String? = restTemplate.getForObject("https://store.steampowered.com/api/appdetails?appids=$gameId",
-            String::class.java)
-        val map: Map<String, Any>? = response?.let { stringToJson.jsonStringToMap(it) }
-        return map?.get(gameId.toString()) as? Map<String, Any>
+    fun getGenre (genre: Int): List<Game> {
+        TODO("Implement parsing Steam Store web from search page ")
+    }
+
+    fun getGamesByGenre(genre: Int): List<Game> {
+        TODO("Implement parsing Steam Store web from search page ")
+    }
+
+    fun searchGame(gameName: String): List<Game> {
+        TODO("Implement parsing Steam Store web from search page ")
+    }
+
+    fun getGame(gameId: Int)  {
+        val url = "https://store.steampowered.com/api/appdetails?appids=$gameId"
+        val response = restTemplate.getForObject(url, ApiData::class.java)
+        if (response == null || response.name.isEmpty()) {
+            throw HttpClientErrorException(HttpStatus.NOT_FOUND, "Game not found")
+        }
     }
 }
+
+class StoreApiResponseDeserializer : JsonDeserializer<ApiData>() {
+    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): ApiData? {
+        val node: JsonNode = p.codec.readTree(p)
+        var data : ApiData? = null
+
+        node.fields().forEach { (_, value) ->
+            val success = value["success"].asBoolean()
+
+            if (success){
+                val dataNode = value["data"]
+                val name : String
+                val appId : Int
+                val screenshots = mutableListOf<String>()
+                val description : String
+                val developers = mutableListOf<String>()
+                val releaseDate : String
+                val price : String
+
+                dataNode["name"]!!.let { name = it.asText()}
+                dataNode["steam_appid"]!!.let { appId = it.asInt() }
+                dataNode["screenshots"]!!.let {
+                    it.forEach { screenshot ->
+                        val path = screenshot["path_thumbnail"].asText()
+                        screenshots.add(path)
+                    }
+                }
+                dataNode["detailed_description"]!!.let { description = it.asText() }
+                dataNode["developers"]!!.let {
+                    it.forEach { developer ->
+                        developers.add(developer.asText())
+                    }
+                }
+                dataNode["release_date"]!!["date"]!!.let { releaseDate = it.asText() }
+                dataNode["price_overview"]!!["final"]!!.let { price = it.asText() }
+
+                data = ApiData(appId, name, price, screenshots, description, developers, releaseDate)
+            }
+        }
+        return data
+    }
+}
+@JsonDeserialize(using = StoreApiResponseDeserializer::class)
+data class ApiData(val id : Int,
+                   val name: String,
+                   val price: String,
+                   val images: List<String>,
+                   val description: String,
+                   val developers: List<String>,
+                   val releaseDate: String)
 
 data class Game(val appid: Int, val name: String)
 data class SteamApiResponse(val applist: AppList)

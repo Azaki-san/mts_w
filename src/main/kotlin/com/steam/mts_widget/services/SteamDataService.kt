@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate
 
 
 @Service
-class SteamDataService(private val restTemplate: RestTemplate, private val stringToJson: StringToJsonService) {
+class SteamDataService(private val restTemplate: RestTemplate) {
     fun getAllDiscountedGames(): List<Game> {
         TODO("Implement parsing Steam Store web, only discounted games")
     }

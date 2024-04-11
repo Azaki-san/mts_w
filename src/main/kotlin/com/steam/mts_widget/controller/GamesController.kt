@@ -50,4 +50,5 @@ class GamesController(private val steamDataService: SteamDataService, private va
     fun getGamesByGenre(@RequestParam(required = true) genre: String?): ResponseEntity<Any> {
         return ResponseEntity.ok(steamWebParser.getGenres())
     }
+
 }

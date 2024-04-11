@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.network.parseGetRequestBlocking
 import com.fleeksoft.ksoup.nodes.Document
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.client.HttpClientErrorException
 
 @Service
 class SteamWebParser (private val apiParser: SteamDataService, private val mapper:ObjectMapper) {
@@ -18,9 +20,11 @@ class SteamWebParser (private val apiParser: SteamDataService, private val mappe
         val gameInfos : MutableList<ApiData> = mutableListOf()
         for (i in 0 until 11) {
             val id = discountedGames[i].attr("data-ds-appid").split(",")[0].toInt()
-            gameInfos.add(
-                apiParser.getGame(id)!!
-            )
+            val game = apiParser.getGame(id)
+            if (game != null) {
+                gameInfos.add(game)
+                continue
+            }
         }
         return mapper.writeValueAsString(gameInfos)
     }
@@ -73,8 +77,8 @@ class SteamWebParser (private val apiParser: SteamDataService, private val mappe
             data = Genres(genres)
             return mapper.writeValueAsString(data)
         } else {
-            println("No elements found with the specified class.")
+            throw HttpClientErrorException(HttpStatus.NOT_FOUND, "No elements found with the specified class.")
         }
-        return ""
+
     }
 }

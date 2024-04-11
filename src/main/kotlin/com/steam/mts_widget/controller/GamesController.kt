@@ -2,6 +2,7 @@ package com.steam.mts_widget.controller
 
 import com.steam.mts_widget.services.Game
 import com.steam.mts_widget.services.SteamDataService
+import com.steam.mts_widget.services.SteamWebParser
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -11,7 +12,7 @@ import org.springframework.web.client.HttpClientErrorException
 
 
 @RestController
-class GamesController(private val steamDataService: SteamDataService){
+class GamesController(private val steamDataService: SteamDataService, private val steamWebParser: SteamWebParser){
     @GetMapping("/help")
     fun copyright(): String {
         return "©2024 Techaas. All rights reserved"
@@ -20,6 +21,11 @@ class GamesController(private val steamDataService: SteamDataService){
     @GetMapping("/games")
     fun getAllGames(): ResponseEntity<List<Game>> {
         return ResponseEntity.ok(steamDataService.getAllDiscountedGames())
+    }
+
+    @GetMapping("/discounted")
+    fun getDiscountedGames(): ResponseEntity<Int> {
+        return ResponseEntity.ok(steamWebParser.parseDiscountedGames())
     }
 
     @GetMapping("/game")

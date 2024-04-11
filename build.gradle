@@ -24,7 +24,9 @@ dependencies {
 	implementation 'org.jetbrains.kotlin:kotlin-reflect'
 	implementation 'com.google.code.gson:gson:2.9.1'
 	implementation 'com.fleeksoft.ksoup:ksoup:0.1.2'
-    implementation 'com.fleeksoft.ksoup:ksoup-network:0.1.2'
+  implementation 'com.fleeksoft.ksoup:ksoup-network:0.1.2'
+	implementation 'org.seleniumhq.selenium:selenium-java:4.14.1'
+	implementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

@@ -20,10 +20,10 @@ class PayController(private val sbpService: SBPService, private val currencyConv
     ): ResponseEntity<String> {
         when {
             priceWithoutFee is Int && username is String -> {
-                val priceFinal = if (priceWithoutFee < 350) {
-                     350
-                } else {
-                    priceWithoutFee
+                val priceFinal = when {
+                    priceWithoutFee < 350 -> 350
+                    priceWithoutFee > 14450 -> 14450
+                    else -> priceWithoutFee
                 }
                 val priceUSDWithFee = currencyConverterService.getSteamUsdFromRub(priceFinal)
                 when {

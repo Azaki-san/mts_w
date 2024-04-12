@@ -2,10 +2,8 @@ package com.steam.mts_widget.services
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fleeksoft.ksoup.Ksoup
-import com.fleeksoft.ksoup.network.parseGetRequest
 import com.fleeksoft.ksoup.network.parseGetRequestBlocking
 import com.fleeksoft.ksoup.nodes.Document
-import com.fleeksoft.ksoup.select.Elements
 import org.springframework.stereotype.Service
 
 @Service

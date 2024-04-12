@@ -20,18 +20,20 @@ class PayController(private val sbpService: SBPService, private val currencyConv
     ): ResponseEntity<String> {
         when {
             priceWithoutFee is Int && username is String -> {
-                val priceFinal = when {
-                    priceWithoutFee < 350 -> 350
-                    priceWithoutFee > 14450 -> 14450
-                    else -> priceWithoutFee
-                }
-                val priceUSDWithFee = currencyConverterService.getSteamUsdFromRub(priceFinal)
+
+                val priceUSDWithFee = currencyConverterService.getSteamUsdFromRub(priceWithoutFee)
                 when {
                     priceUSDWithFee is Double -> {
                         val priceRUBWithFee = currencyConverterService.getMtsRubFromSteamUsd(priceUSDWithFee)
                         when {
                             priceRUBWithFee is Double -> {
-                                val link: String? = sbpService.getBillLink(ceil(priceRUBWithFee).toInt(), username)
+                                val priceCeil = ceil(priceRUBWithFee).toInt()
+                                val priceFinal = when {
+                                    priceCeil < 350 -> 350
+                                    priceCeil > 14950 -> 14950
+                                    else -> priceCeil
+                                }
+                                val link: String? = sbpService.getBillLink(priceFinal, username)
                                 return when {
                                     link is String -> {
                                         ResponseEntity

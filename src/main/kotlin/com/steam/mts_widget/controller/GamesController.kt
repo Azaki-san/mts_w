@@ -51,4 +51,16 @@ class GamesController(private val steamDataService: SteamDataService, private va
         return ResponseEntity.ok(steamWebParser.getGenres())
     }
 
+
+
+
+
+
+
+
+
+    @GetMapping("/games/{genre}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getByGenre(@PathVariable genre: String?): ResponseEntity<String> {
+        return ResponseEntity.ok(genre?.let { steamWebParser.parseGameByGenre(it) })
+    }
 }

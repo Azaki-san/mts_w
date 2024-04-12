@@ -76,6 +76,7 @@ class SteamWebParser(private val apiParser: SteamDataService, private val mapper
                 try {
                     apiParser.getGame(appId)?.let { gameInfos.add(it) }
                 } catch (e: Exception) {
+                    count--
                     continue
                 }
                 count++

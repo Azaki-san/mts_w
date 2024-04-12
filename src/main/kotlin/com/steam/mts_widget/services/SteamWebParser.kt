@@ -74,12 +74,12 @@ class SteamWebParser(private val apiParser: SteamDataService, private val mapper
             if (appIdMatch != null) {
                 val appId = appIdMatch.groupValues[1].toInt()
                 try {
+                    count++
                     apiParser.getGame(appId)?.let { gameInfos.add(it) }
                 } catch (e: Exception) {
                     count--
                     continue
                 }
-                count++
                 if (count >= 10) break
             }
         }

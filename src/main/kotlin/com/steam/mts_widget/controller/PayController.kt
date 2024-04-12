@@ -11,14 +11,19 @@ import kotlin.math.ceil
 
 @RestController
 class PayController(private val sbpService: SBPService, private val currencyConverterService: CurrencyConverterService) {
-    @GetMapping("/bill")
+    @GetMapping("/buy")
     fun getBillLink(
         @RequestParam(required = true) priceWithoutFee: Int?,
         @RequestParam(required = true) username: String?
     ): ResponseEntity<String> {
         when {
             priceWithoutFee is Int && username is String -> {
-                val priceUSDWithFee = currencyConverterService.getSteamUsdFromRub(priceWithoutFee)
+                val priceFinal = if (priceWithoutFee < 350) {
+                     350
+                } else {
+                    priceWithoutFee
+                }
+                val priceUSDWithFee = currencyConverterService.getSteamUsdFromRub(priceFinal)
                 when {
                     priceUSDWithFee is Double -> {
                         val priceRUBWithFee = currencyConverterService.getMtsRubFromSteamUsd(priceUSDWithFee)
@@ -27,20 +32,29 @@ class PayController(private val sbpService: SBPService, private val currencyConv
                                 val link: String? = sbpService.getBillLink(ceil(priceRUBWithFee).toInt(), username)
                                 return when {
                                     link is String -> {
-                                        ResponseEntity.status(HttpStatus.OK).body(link);
+                                        ResponseEntity
+                                            .status(HttpStatus.PERMANENT_REDIRECT)
+                                            .header("Location", link)
+                                            .body("Redirecting to $link")
                                     }
                                     else -> {
-                                        ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Cannot generate link")
+                                        ResponseEntity
+                                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                            .body("Cannot generate link")
                                     }
                                 }
                             }
                             else -> {
-                                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: MTS is down.")
+                                return ResponseEntity
+                                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                    .body("Error: MTS is down.")
                             }
                         }
                     }
                     else -> {
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: STEAM is down.")
+                        return ResponseEntity
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Error: STEAM is down.")
                     }
                 }
             }

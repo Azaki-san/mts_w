@@ -7,13 +7,14 @@ import com.steam.mts_widget.services.SteamWebParser
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.HttpClientErrorException
 
-
+@CrossOrigin(origins = ["http://localhost:5174"], maxAge = 3600)
 @RestController
 class GamesController(private val steamDataService: SteamDataService, private val steamWebParser: SteamWebParser) {
     @GetMapping("/help")
@@ -26,7 +27,7 @@ class GamesController(private val steamDataService: SteamDataService, private va
         return ResponseEntity.ok(steamWebParser.parseDiscountedGames())
     }
 
-    @GetMapping("/game")
+    @GetMapping("/game", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getGame(@RequestParam(required = true) gameId: String?): ResponseEntity<Any> {
         if (gameId == null || !gameId.matches(Regex("\\d+"))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Parameter 'gameId' must be a valid integer")
@@ -40,10 +41,23 @@ class GamesController(private val steamDataService: SteamDataService, private va
         }
     }
 
+    @GetMapping("/search/{word}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun searchGame(@PathVariable word: String?): ResponseEntity<String>{
+        return ResponseEntity.ok(steamWebParser.searchGameWithWord(word))
+    }
+
     @GetMapping("/genres", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getGamesByGenre(@RequestParam(required = true) genre: String?): ResponseEntity<Any> {
         return ResponseEntity.ok(steamWebParser.getGenres())
     }
+
+
+
+
+
+
+
+
 
     @GetMapping("/games/{genre}", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getByGenre(@PathVariable genre: String?): ResponseEntity<String> {

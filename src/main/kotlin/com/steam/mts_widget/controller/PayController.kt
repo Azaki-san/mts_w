@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import kotlin.math.ceil
 
-@CrossOrigin(origins = ["http://localhost:5174"], maxAge = 3600)
+@CrossOrigin(origins = ["http://localhost:5173","http://localhost:5174"])
 @RestController
 class PayController(private val sbpService: SBPService, private val currencyConverterService: CurrencyConverterService) {
     @GetMapping("/buy")

@@ -1,5 +1,6 @@
 package com.steam.mts_widget.controller
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.gson.JsonObject
 import com.steam.mts_widget.services.Game
 import com.steam.mts_widget.services.SteamDataService
@@ -14,9 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.HttpClientErrorException
 
-@CrossOrigin(origins = ["http://localhost:5174"], maxAge = 3600)
+@CrossOrigin(origins = [ "http://localhost:5173","http://localhost:5174"])
 @RestController
-class GamesController(private val steamDataService: SteamDataService, private val steamWebParser: SteamWebParser) {
+class GamesController(
+    private val steamDataService: SteamDataService,
+    private val steamWebParser: SteamWebParser,
+    private val mapper: ObjectMapper
+) {
     @GetMapping("/help")
     fun copyright(): ResponseEntity<String> {
         return ResponseEntity.ok("©2024 Techaas. All rights reserved")
@@ -27,15 +32,16 @@ class GamesController(private val steamDataService: SteamDataService, private va
         return ResponseEntity.ok(steamWebParser.parseDiscountedGames())
     }
 
-    @GetMapping("/game", produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun getGame(@RequestParam(required = true) gameId: String?): ResponseEntity<Any> {
-        if (gameId == null || !gameId.matches(Regex("\\d+"))) {
+    @GetMapping("/game/{id}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getGame(@PathVariable(required = true) id: String?): ResponseEntity<Any> {
+        if (id == null || !id.matches(Regex("\\d+"))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Parameter 'gameId' must be a valid integer")
         }
         return try {
-            val gameIdInt = gameId.toInt()
-            steamDataService.getGame(gameIdInt)
-            ResponseEntity.ok("Game details fetched for app ID: $gameId")
+            val gameIdInt = id.toInt()
+            return ResponseEntity.ok(
+                mapper.writeValueAsString(steamDataService.getGame(gameIdInt))
+            )
         } catch (e: HttpClientErrorException) {
             ResponseEntity.status(e.statusCode).body("Error fetching game details: ${e.message}")
         }

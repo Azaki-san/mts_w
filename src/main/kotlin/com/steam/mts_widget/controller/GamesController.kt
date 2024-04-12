@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.HttpClientErrorException
@@ -42,5 +43,10 @@ class GamesController(private val steamDataService: SteamDataService, private va
     @GetMapping("/genres", produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getGamesByGenre(@RequestParam(required = true) genre: String?): ResponseEntity<Any> {
         return ResponseEntity.ok(steamWebParser.getGenres())
+    }
+
+    @GetMapping("/games/{genre}", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun getByGenre(@PathVariable genre: String?): ResponseEntity<String> {
+        return ResponseEntity.ok(genre?.let { steamWebParser.parseGameByGenre(it) })
     }
 }

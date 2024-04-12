@@ -19,11 +19,11 @@ class MtsWidgetApplicationTests {
     @Test
     fun `test bill endpoint with valid parameters`() {
         mockMvc.perform(
-            get("/bill")
+            get("/buy")
                 .param("priceWithoutFee", "350")
                 .param("username", "the_jack_zaka")
         )
-            .andExpect(status().isOk)
+            .andExpect(status().isPermanentRedirect)
     }
 
     @Test
@@ -31,7 +31,7 @@ class MtsWidgetApplicationTests {
         val expectedResponseBody =
             "Parameter 'priceWithoutFee' must be a valid integer. Parameter 'username' must be a valid string."
         mockMvc.perform(
-            get("/bill")
+            get("/buy")
                 .param("priceWithoutFee", "abc")
                 .param("username", "123фыas")
         )
@@ -42,7 +42,7 @@ class MtsWidgetApplicationTests {
     fun `test bill endpoint without priceWithoutFee`() {
         val expectedResponseBody = "Parameter 'priceWithoutFee' must be a valid integer."
         mockMvc.perform(
-            get("/bill")
+            get("/buy")
                 .param("username", "123")
         )
             .andExpect(status().isBadRequest)
@@ -53,7 +53,7 @@ class MtsWidgetApplicationTests {
     fun `test bill endpoint without priceWithoutUsername`() {
         val expectedResponseBody = "Parameter 'username' must be a valid string."
         mockMvc.perform(
-            get("/bill")
+            get("/buy")
                 .param("priceWithoutFee", "355")
         )
             .andExpect(status().isBadRequest)
@@ -65,7 +65,7 @@ class MtsWidgetApplicationTests {
         val expectedResponseBody =
             "Parameter 'priceWithoutFee' must be a valid integer. Parameter 'username' must be a valid string."
 
-        mockMvc.perform(get("/bill"))
+        mockMvc.perform(get("/buy"))
             .andExpect(status().isBadRequest)
             .andExpect(content().string(containsString(expectedResponseBody)))
     }

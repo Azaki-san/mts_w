@@ -68,7 +68,7 @@ class StoreApiResponseDeserializer : JsonDeserializer<ApiData>() {
                 dataNode["release_date"]!!["date"]!!.let { releaseDate = it.asText() }
                 when (val priceOverview = dataNode["price_overview"]) {
                     null -> return null
-                    else -> price = priceOverview["final"].asText()
+                    else -> price = (priceOverview["final"].asText().toInt() / 100).toString()
                 }
 
                 return ApiData(appId, name, price, screenshots, description, developers, releaseDate)
